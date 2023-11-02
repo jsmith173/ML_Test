@@ -70,6 +70,32 @@ CONFIG=Debug
 # If set to "true" or "1", display full command-lines when building.
 VERBOSE=
 
+# Neural Network Configuration. Options include
+#
+# float    -- floating point for the input data and weights
+# int8x8   -- 8-bit fixed-point for the input data and weights
+# int16x8  -- 16-bit fixed-point for the input data and 8-bit for weights
+# int16x16 -- 16-bit fixed-point for the input data and weights
+NN_TYPE=float
+
+# Model Name to be loaded to the firmware
+NN_MODEL_NAME=IMG_CLASS
+
+# Folder name containing the model and regression data
+NN_MODEL_FOLDER=./mtb_ml_gen
+
+# Choose the inference engine
+# tflm      -- TensorFlow Lite for Microcontrollers inference engine with interpreter
+# tflm_less -- TensorFlow Lite for Microcontrollers inference engine interpreter-less
+# ifx       -- Infineon ModusToolbox ML inference engine
+NN_INFERENCE_ENGINE=tflm
+
+# Shield used to gather IMU data
+#
+# CY_028_TFT_SHIELD    -- Using the 028-TFT shield
+# CY_028_SENSE_SHIELD_v1  -- Using the 028-SENSE shield rev**
+# CY_028_SENSE_SHIELD_v2  -- Using the 028-SENSE shield rev*A or later
+# SHIELD_DATA_COLLECTION=CY_028_TFT_SHIELD
 
 ################################################################################
 # Advanced Configuration
@@ -96,15 +122,78 @@ DISABLE_COMPONENTS=
 # by default, or otherwise not found by the build system.
 SOURCES=
 
+NN_MODEL_FOLDER=mtb_ml_gen
+
+# Select only the regression and model files that belong to the desired
+# settings. 
+MODEL_PREFIX=$(subst $\",,$(NN_MODEL_NAME))
+CY_IGNORE+=$(NN_MODEL_FOLDER)
+# Add the model file based on the inference and data types
+SOURCES+=$(wildcard $(NN_MODEL_FOLDER)/mtb_ml_models/$(MODEL_PREFIX)_$(NN_INFERENCE_ENGINE)_model_$(NN_TYPE).c*)
+
+# Ignore any other model and regression data files
+CY_IGNORE+=$(LIST_IGNORE_MODELS)
+CY_IGNORE+=$(LIST_IGNORE_REGDATA)
+
 # Like SOURCES, but for include directories. Value should be paths to
 # directories (without a leading -I).
-INCLUDES=
+INCLUDES=$(NN_MODEL_FOLDER)/mtb_ml_models source
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES=
+DEFINES=MODEL_NAME=$(NN_MODEL_NAME)
+
+# Add additional define to select the inference engine
+ifeq (tflm, $(NN_INFERENCE_ENGINE))
+COMPONENTS+=ML_TFLM_INTERPRETER IFX_CMSIS_NN
+DEFINES+=TF_LITE_STATIC_MEMORY
+endif
+
+ifeq (tflm_less, $(NN_INFERENCE_ENGINE))
+COMPONENTS+=ML_TFLM_INTERPRETER_LESS IFX_CMSIS_NN
+DEFINES+=TF_LITE_STATIC_MEMORY TF_LITE_MICRO_USE_OFFLINE_OP_USER_DATA
+endif
+
+ifeq (ifx, $(NN_INFERENCE_ENGINE))
+COMPONENTS+=ML_IFX IFX_CMSIS_NN
+endif
+
+
+# Depending which Neural Network Type, add a specific DEFINE and COMPONENT
+ifeq (float, $(NN_TYPE))
+COMPONENTS+=ML_FLOAT32
+endif
+ifeq (int16x16, $(NN_TYPE))
+COMPONENTS+=ML_INT16x16
+endif
+ifeq (int16x8, $(NN_TYPE))
+COMPONENTS+=ML_INT16x8
+endif
+ifeq (int8x8, $(NN_TYPE))
+COMPONENTS+=ML_INT8x8
+endif
+
+# Depending which shield is used for data collection, add specific DEFINE
+ifeq (CY_028_TFT_SHIELD, $(SHIELD_DATA_COLLECTION))
+DEFINES+=CY_BMI_160_IMU_I2C=1
+endif
+ifeq (CY_028_SENSE_SHIELD_v1, $(SHIELD_DATA_COLLECTION))
+DEFINES+=CY_BMX_160_IMU_SPI=1
+DEFINES+=CY_IMU_SPI=1
+endif
+ifeq (CY_028_SENSE_SHIELD_v2, $(SHIELD_DATA_COLLECTION))
+DEFINES+=CY_BMI_160_IMU_SPI=1
+DEFINES+=CY_IMU_SPI=1
+endif
+
+# Check if IAR is used with TFLM. If yes, trigger an error
+ifeq ($(NN_INFERENCE_ENGINE), $(filter $(NN_INFERENCE_ENGINE),tflm tflm_less))
+   ifeq ($(TOOLCHAIN), IAR)
+      $(error Only GCC_ARM and ARM toolchains are supported for TFLM inference engine)
+   endif
+endif
 
 # Select softfp or hardfp floating point. Default is softfp.
-VFP_SELECT=
+VFP_SELECT=hardfp
 
 # Additional / custom C compiler flags.
 #
