@@ -3,7 +3,6 @@
 	<name>ML_Test</name>
 	<comment></comment>
 	<projects>
-		<project>mtb_shared</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -26,4 +25,26 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>external_files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>external_files/IMG_CLASS_tflm_model_float.c</name>
+			<type>1</type>
+			<locationURI>PARENT-0-PROJECT_LOC/mtb_ml_gen/mtb_ml_models/IMG_CLASS_tflm_model_float.c</locationURI>
+		</link>
+		<link>
+			<name>external_dirs</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>external_dirs/mtb_ml_gen</name>
+			<type>2</type>
+			<locationURI>PARENT-0-PROJECT_LOC/mtb_ml_gen/mtb_ml_models</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
