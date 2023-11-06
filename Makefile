@@ -226,7 +226,10 @@ LINKER_SCRIPT=
 PREBUILD=
 
 # Custom post-build commands to run.
-POSTBUILD=
+TOOLCHAIN_PATH:=c:/Users/Attila/ModusToolbox/tools_3.1/gcc
+ELF_PATH:=c:/Work/mtw/ML_Test/build/APP_CY8CKIT-062S2-43012/Debug
+MTB_TOOLCHAIN_GCC_ARM__OBJDUMP:=$(TOOLCHAIN_PATH)/bin/arm-none-eabi-objdump
+POSTBUILD=$(MTB_TOOLCHAIN_GCC_ARM__OBJDUMP) -S $(ELF_PATH)/$(APPNAME).elf > $(ELF_PATH)/$(APPNAME).list
 
 
 ################################################################################

@@ -8,7 +8,7 @@
     "model": {
         "inference_engine": "tflm",
         "key_model": "IMG_CLASS",
-        "load_model": "C:/Work/mtw/ML_Test/pretrained_models/classification.h5",
+        "load_model": "C:/Work/mtw/ML_Test/pretrained_models/mnist.h5",
         "optimization_settings": {
             "headroom_weights": 6,
             "quantization": [

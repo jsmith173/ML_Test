@@ -1,1 +1,1 @@
-Used Arena Size: 738653  Required size: 722kB
+Used Arena Size: 109341  Required size: 107kB
