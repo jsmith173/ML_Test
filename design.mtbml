@@ -6,7 +6,7 @@
         "feat_col_first": 0,
         "input_calibration_type": "NPZ",
         "input_format": "JPEG",
-        "path": "",
+        "path": "pretrained_models/mnist_calib.npz",
         "target_col_count": 1,
         "target_col_first": 0
     },
@@ -28,7 +28,7 @@
         "sparsity_tflm": false,
         "tflm_model_quantization": "FLOAT"
     },
-    "name": "IMG_CLASS",
+    "name": "MNIST",
     "output_dir": "mtb_ml_gen",
     "target": "PSoC6",
     "toolsPackage": "ModusToolbox Machine Learning Pack 2.0.0",

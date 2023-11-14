@@ -76,10 +76,10 @@ VERBOSE=
 # int8x8   -- 8-bit fixed-point for the input data and weights
 # int16x8  -- 16-bit fixed-point for the input data and 8-bit for weights
 # int16x16 -- 16-bit fixed-point for the input data and weights
-NN_TYPE=float
+NN_TYPE=int8x8
 
 # Model Name to be loaded to the firmware
-NN_MODEL_NAME=IMG_CLASS
+NN_MODEL_NAME=MNIST
 
 # Folder name containing the model and regression data
 NN_MODEL_FOLDER=./mtb_ml_gen
@@ -226,10 +226,7 @@ LINKER_SCRIPT=
 PREBUILD=
 
 # Custom post-build commands to run.
-TOOLCHAIN_PATH:=c:/Users/Attila/ModusToolbox/tools_3.1/gcc
-ELF_PATH:=c:/Work/mtw/ML_Test/build/APP_CY8CKIT-062S2-43012/Debug
-MTB_TOOLCHAIN_GCC_ARM__OBJDUMP:=$(TOOLCHAIN_PATH)/bin/arm-none-eabi-objdump
-POSTBUILD=$(MTB_TOOLCHAIN_GCC_ARM__OBJDUMP) -S $(ELF_PATH)/$(APPNAME).elf > $(ELF_PATH)/$(APPNAME).list
+POSTBUILD=$(CY_TOOLS_DIR)/gcc/bin/arm-none-eabi-objdump.exe -S ./build/$(TARGET)/Debug/$(APPNAME).elf > ./build/$(TARGET)/Debug/$(APPNAME).list
 
 
 ################################################################################
