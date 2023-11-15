@@ -121,8 +121,8 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-	// Run inference
-	for (int i=0; i<10; i++) {
+	// Run inference: idx=4
+	for (int i=4; i<5; i++) {
 		
 #if QUANTIZED_INPUT
         /* Feed the Model */
@@ -148,7 +148,8 @@ int main(void)
  	    a[i]=class_index;
 	}
 	
-	a[11]=DBG_2;
+    a[11]=class_index;
+	a[12]=DBG_2;
 
     for (;;)
     {

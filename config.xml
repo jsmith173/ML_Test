@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config desc="cortex-m4">
-  <device name="CY8C6347BZI" />
+  <device name="CY8C624ABZI" />
   <file name="mtb-example-empty-app.elf" />
 </config>
