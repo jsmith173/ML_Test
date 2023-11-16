@@ -79,7 +79,7 @@ VERBOSE=
 NN_TYPE=int8x8
 
 # Model Name to be loaded to the firmware
-NN_MODEL_NAME=MNIST
+NN_MODEL_NAME=IMG_CLASS
 
 # Folder name containing the model and regression data
 NN_MODEL_FOLDER=./mtb_ml_gen

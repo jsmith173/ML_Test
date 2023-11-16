@@ -3,7 +3,6 @@
 
 #include "mtb_ml_model.h"
 #include "img_array.h"
-//#include "img_array_quant.h"
 
 /* Include model files */
 #include MTB_ML_INCLUDE_MODEL_FILE(MODEL_NAME)
@@ -14,11 +13,10 @@ static MTB_ML_DATA_T *result_buffer;
 static int model_output_size;
 volatile int a[16];
 volatile int class_index;
-const dtype* p_images[10];
+const dtype* p_image;
 
 #define DBG_1 1
 #define DBG_2 2
-#define QUANTIZED_INPUT 0
 
 #if (COMPONENT_ML_INT16x16 || COMPONENT_ML_INT16x8)
     #define QFORMAT_VALUE    15
@@ -31,29 +29,7 @@ cy_rslt_t my_model_init(void)
 {
     cy_rslt_t result;
 
-#if QUANTIZED_INPUT
-    p_images[0] = img_array_quant0;
-    p_images[1] = img_array_quant1;
-    p_images[2] = img_array_quant2;
-    p_images[3] = img_array_quant3;
-    p_images[4] = img_array_quant4;
-    p_images[5] = img_array_quant5;
-    p_images[6] = img_array_quant6;
-    p_images[7] = img_array_quant7;
-    p_images[8] = img_array_quant8;
-    p_images[9] = img_array_quant9;
-#else
-    p_images[0] = img_array0;
-    p_images[1] = img_array1;
-    p_images[2] = img_array2;
-    p_images[3] = img_array3;
-    p_images[4] = img_array4;
-    p_images[5] = img_array5;
-    p_images[6] = img_array6;
-    p_images[7] = img_array7;
-    p_images[8] = img_array8;
-    p_images[9] = img_array9;
-#endif	
+    p_image = img_array;
 
     mtb_ml_model_bin_t my_model_bin = {MTB_ML_MODEL_BIN_DATA(MODEL_NAME)};
 
@@ -105,7 +81,7 @@ int main(void)
 {
     cy_rslt_t result;
     MTB_ML_DATA_T *input_reference;
-    int8_t p_image_int[28*28]; // static memory for 28*28 grayscaled image
+    int8_t p_image_int[96*96*3]; // static memory for 96*96*3 image
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
@@ -121,32 +97,21 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-	// Run inference: idx=4
-	for (int i=4; i<5; i++) {
-		
-#if QUANTIZED_INPUT
-        /* Feed the Model */
-        input_reference = (MTB_ML_DATA_T *) p_images[i];
-        mtb_ml_model_run(my_model_obj, input_reference);
-        class_index = control(result_buffer, model_output_size);
 
-#elif !COMPONENT_ML_FLOAT32
-        /* Quantize data before feeding model */
-        //mtb_ml_utils_model_quantize(my_model_obj, p_images[i], p_image_int);
-        quantize_input(my_model_obj, p_images[i], p_image_int);
+#if !COMPONENT_ML_FLOAT32
+    /* Quantize data before feeding model */
+    quantize_input(my_model_obj, p_image, p_image_int);
 
-        /* Feed the Model */
-        input_reference = (MTB_ML_DATA_T *) p_image_int;
-        mtb_ml_model_run(my_model_obj, input_reference);
-        class_index = control(result_buffer, model_output_size);
+    /* Feed the Model */
+	input_reference = (MTB_ML_DATA_T *) p_image;
+	mtb_ml_model_run(my_model_obj, input_reference);
+	class_index = control(result_buffer, model_output_size);
 #else
-        input_reference = (MTB_ML_DATA_T *)p_images[i];
-        mtb_ml_model_run(my_model_obj, input_reference);
-        class_index = control(result_buffer, model_output_size); 
+	input_reference = (MTB_ML_DATA_T *)p_image;
+	mtb_ml_model_run(my_model_obj, input_reference);
+	class_index = control(result_buffer, model_output_size);
 #endif
-	 
- 	    a[i]=class_index;
-	}
+ 
 	
     a[11]=class_index;
 	a[12]=DBG_2;
