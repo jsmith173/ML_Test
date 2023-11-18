@@ -68,7 +68,7 @@ TOOLCHAIN=GCC_ARM
 CONFIG=Debug
 
 # If set to "true" or "1", display full command-lines when building.
-VERBOSE=
+VERBOSE=1
 
 # Neural Network Configuration. Options include
 #
