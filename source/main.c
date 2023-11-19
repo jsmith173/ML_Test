@@ -18,6 +18,9 @@ const dtype* p_image;
 #define DBG_1 1
 #define DBG_2 2
 
+#define dim_w 96
+#define dim_h 96
+
 #if (COMPONENT_ML_INT16x16 || COMPONENT_ML_INT16x8)
     #define QFORMAT_VALUE    15
 #endif
@@ -72,11 +75,12 @@ void quantize_input(mtb_ml_model_t *my_model_obj, dtype* src, int8_t* dest)
 {
 	int k, N, data;
 	uint8_t ui8Data;
-
-	N = my_model_obj->input_size/3;
+	
+	// RGB values are stores as 'int' values in src. It is 'float' but it has only integer part
+	N = my_model_obj->input_size/3; //(96,96,3)->(96,96)
 	k = 0;
 	for (int i = 0; i < N; i++) {
-	 data = img_array[i];
+	 data = src[i];
 	 for (int j = 0; j < 3; j++) {
 	  ui8Data = data & 0xFF;
 
@@ -93,7 +97,7 @@ int main(void)
 {
     cy_rslt_t result;
     MTB_ML_DATA_T *input_reference;
-    int8_t p_image_int[96*96*3]; // static memory for 96*96*3 image
+    int8_t p_image_int[dim_w*dim_h*3]; // static memory for the rgb image
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
@@ -124,7 +128,7 @@ int main(void)
 #endif
  
 	
-    a[11]=class_index;
+    a[11]=class_index; // should be 3 (sunflower)
 	a[12]=DBG_2;
 
     for (;;)
