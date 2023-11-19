@@ -68,12 +68,24 @@ int control(MTB_ML_DATA_T* result_buffer, int model_output_size)
 	return class_index;
 }
 
-void quantize_input(mtb_ml_model_t *my_model_obj, float* src, int8_t* dest)
+void quantize_input(mtb_ml_model_t *my_model_obj, dtype* src, int8_t* dest)
 {
-	for (int i=0; i<my_model_obj->input_size; i++) {
- 	 float x = src[i];
-     int8_t x_quantized = x / my_model_obj->input_scale + my_model_obj->input_zero_point;
-     dest[i] = x_quantized;
+	int k, N, data;
+	uint8_t ui8Data;
+
+	N = my_model_obj->input_size/3;
+	k = 0;
+	for (int i = 0; i < N; i++) {
+	 data = img_array[i];
+	 for (int j = 0; j < 3; j++) {
+	  ui8Data = data & 0xFF;
+
+	  float x = ui8Data;
+	  int8_t x_quantized = x / my_model_obj->input_scale + my_model_obj->input_zero_point;
+	  dest[k++] = x_quantized;
+
+	  data >>= 8;
+	 }
 	}
 }
 
@@ -97,13 +109,12 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-
 #if !COMPONENT_ML_FLOAT32
     /* Quantize data before feeding model */
     quantize_input(my_model_obj, p_image, p_image_int);
 
     /* Feed the Model */
-	input_reference = (MTB_ML_DATA_T *) p_image;
+	input_reference = (MTB_ML_DATA_T *) p_image_int;
 	mtb_ml_model_run(my_model_obj, input_reference);
 	class_index = control(result_buffer, model_output_size);
 #else

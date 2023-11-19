@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define dtype float
+#define dtype int
 
 extern const dtype img_array[];
 
