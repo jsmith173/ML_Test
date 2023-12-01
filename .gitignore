@@ -8,12 +8,12 @@
 # code into a VCS, you can ignore the .gitignore file.
 
 # ModusToolbox library repos or information about library dependencies
-libs/
+#libs/
 
 # Eclipse IDE for ModusToolbox files
 .metadata/
 # .cyignore
-# .settings/
+.settings/
 # .cproject
 # .project
 # .mtbLaunchConfigs/
